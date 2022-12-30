@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Playlist Filterer</title>
+    <link rel="shortcut icon" href="images/spotify.webp">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link href="style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div id = "introSection">
+            <h1 class = "projectName"><img src="images/spotify.webp" width="50" height="50" style="padding: 5px"></img>   Spotify Playlist Filterer</h1>
+            <div>
+                <div class="welcome">
+                    <h3>
+                        Welcome to the Spotify Playlist Filterer. This project as the title suggests, filters spotify playlists on your behalf. 
+                        You will be provided a form, in which you select the desired playlist that you want to create a playlist out of, and 
+                        and then select the desired artists, genres, and date of interest.
+                    </h3>
+                </div>
+
+                <div class="notes">
+                    <h4 class ="keepInMind" style="text-align: center; margin-bottom: 10px;">Some things to keep in mind: </h4>
+                    <ul class="list">
+                        <br>
+                        <li>When you create a brand new playlist with these options, every day the target playlist will be scraped to
+                        keep the newly created playlist up to date matching the initial selected genres, year, and artists.</li>
+                        <br>
+                        <li> In order to perform these actions, authorization of your spotify account will be needed. 
+                        Please authorize below.</li>
+                        <br>
+                    </ul>
+                </div>
+            </div>
+            <div style="text-align: center">
+                <input class="btn btn-primary btn-lg authorize" type="button" onclick="window.location='/auth/spotify'" value="Login with Spotify"><br/>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

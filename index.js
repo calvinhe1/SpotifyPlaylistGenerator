@@ -6,6 +6,8 @@ var express = require('express'),
   SpotifyStrategy = require('passport-spotify').Strategy,
   consolidate = require('consolidate');
 
+const ejs = require("ejs")
+const uuid = require("uuid")
 var bodyParser = require('body-parser');
 const mongoose = require("mongoose")
 const findOrCreate = require('mongoose-findorcreate');
@@ -28,11 +30,11 @@ var authCallbackPath = '/auth/spotify/callback';
 var app = express();
 
 app.use(express.static(__dirname + '/public'))
-app.engine('html', consolidate.nunjucks);
+//app.engine('ejs', consolidate.nunjucks);
 
 // configure Express
-app.set('views', __dirname + '/views');
-app.set('view engine', 'html');
+//app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({
   extended: true
@@ -46,8 +48,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+mongoose.set('strictQuery', true);
 mongoose.connect("mongodb://localhost:27017/playlistDB", {useNewUrlParser: true});
-mongoose.set('strictQuery', false);
 
 
 const userSchema = new mongoose.Schema ({
@@ -63,7 +65,8 @@ const playlistSchema = new mongoose.Schema ({
   playlistId: String,
   artists: [String],
   genres: [String],
-  year: String
+  year: String,
+  uuid: String
 })
 
 userSchema.plugin(passportLocalMongoose);
@@ -71,7 +74,6 @@ userSchema.plugin(findOrCreate);
 
 const User = new mongoose.model("User", userSchema)
 const Playlist = new mongoose.model("Playlist", playlistSchema)
-
 
 passport.use(User.createStrategy())
 
@@ -116,25 +118,31 @@ passport.use(
   )
 );
 
-
 app.get('/', function (req, res) {
-  //res.render('index.html', {user: req.user});
+  //res.render('index.ejs', {user: req.user});
 
   if (req.isAuthenticated()) {
-    console.log("HERE")
-    res.render("create.html")
+    res.render("create.ejs")
   }
   else {
-    res.render("index.html")
+    res.render("index.ejs")
   }
+});
+
+app.get('/logout', function (req, res) {
+  req.logout(function(err) {
+    if (err) {
+      console.log("error logging out: ", err)
+    }
+  });
+  res.redirect('/')
 });
 
 app.get('/create', ensureAuthenticated, function (req, res) {
-  res.render('create.html')
+  res.render('create.ejs')
 });
 
 app.post('/create', async function(req,res) {
-  console.log("req.body: ", req.body)
 
   //return playlist ID.
 
@@ -145,13 +153,15 @@ app.post('/create', async function(req,res) {
   let promise = enterPlaylist(accessTokenGlobal, values[2], values[3], req.body.yearEnter, req.body.playlistName, values[0], values[1])
 
   promise.then((response) => {  
+    console.log("RESPONSE: ", response)
     //Save it in playlist schema.
     const playlist = new Playlist({
         name: values[5],
         playlistId: values[0],
-        artists: values[2],
-        genres: values[3],
+        artists: req.body.artistsEnter,
+        genres: req.body.genresEnter,
         year: req.body.yearEnter,
+        uuid: uuid.v4()
     });
 
     playlist.save().then((result) => {
@@ -171,31 +181,87 @@ app.post('/create', async function(req,res) {
 
 })
 
+app.delete('/deleteAllPlaylists', function(req, res) {
+
+  Playlist.deleteMany({}).then(function() {
+    console.log("Delete all playlists")
+    res.sendStatus(204)
+  }).catch(function(error) {
+    console.log(error)
+  })
+
+  
+})
+
 //View all your playlists page  
 app.get('/playlists', function(req,res) {
 
+  if (!req.isAuthenticated()) {
+    res.render('index')
+  }
 
-  //res.render('/playlists.html')
-})
+  Playlist.find({}, function (err, playlists) {
+    if (err) {
+      console.log(err);
+    } else {
+      if (playlists) {
+       // console.log("playlist: ", playlists)
+        res.render("playlists", {listOfPlaylists: playlists})
+      }
+    }
 
-//delete individual playlist from the playlist page above
-app.delete('/playlists/:id', function(req,res) {
+  })
 
+  //res.render('/playlists.ejs')
 })
 
 //individual playlists page
-app.get('/playlists/:id', function(req,res) {
+app.get('/:playlistUuid', function(req,res) {
+    //Basically open the create page with filled out fields.
+    //what is the id?
+   const playlistUuid = req.path.slice(1)
+
+   Playlist.find({uuid: playlistUuid}, function (err, playlist) {
+    if (err) {
+      console.log(err);
+    } else {
+      if (playlist.length != 0) {
+        //Wrong, you actually want a entirely UNIQUE ID associated with this playlist entry. as a separate field.
+       // console.log("playlist: ", playlists)
+       console.log("playlist: ", playlist)
+        res.render("individualPlaylist", {playlistEdit: playlist[0]})
+      }
+    }
+
+  })
+})
+
+//delete individual playlist from the playlist page above
+app.post('/deletePlaylist/:playlistId', function(req,res) {
+  console.log("using this as the DELETE route")
+
 
 })
 
 //edit an individual playlist page
-app.patch('playlists/:id', function(req,res) {
+app.post('/:playlistUuid', function(req,res) {
+  console.log("Using this as the PUT route.")
+  console.log("req: ", req)
+
+  //get the parameters as well, rerun the function to get track URIs, then compare it with the existing track URIs, and add in the track URIs
+  //that are new.
+  //the new settings might override tracks.
+
+  //so look at existing tracks, if they match NEW tracks keep, if they do not REMOVE, and if they are new ADD.
+
+  //ADD spotify track URIs route, Remove spotify track URIs route.
+
 
 })
 
 /*
 app.get('/login', function (req, res) {
-  res.render('login.html', {user: req.user});
+  res.render('login.ejs', {user: req.user});
 });*/
 
 // GET /auth/spotify
@@ -223,15 +289,6 @@ app.get(
     res.redirect('/create');
   }
 );
-
-app.get('/logout', function (req, res, next) {
-  req.logout(function(err) {
-    if (err) {
-      return next(err)
-    }
-  });
-  res.redirect('/');
-});
 
 app.listen(port, function () {
   console.log('App is listening on port ' + port);
