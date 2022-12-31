@@ -50,6 +50,10 @@
                     </div>
                     <div style="text-align: center">
                             <input id="enter" class="btn btn-primary btn-lg" type="submit"  value="Filter playlist">
+                            <div class="errorMessages">
+                                <% if (locals.errorMessage) %>
+                                    <%- locals.errorMessage %>
+                            </div>
                     </form>
                 </div>
             </div>
