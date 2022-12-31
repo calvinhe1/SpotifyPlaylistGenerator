@@ -16,8 +16,10 @@ const passportLocalMongoose = require("passport-local-mongoose");
 
 const { getPlaylistId} = require("./public/logic")
 const { enterPlaylist } = require('./public/logic');
+const { deletePlaylist } = require("./public/logic");
 const { response } = require('express');
 const e = require('express');
+const { useParams } = require('react-router-dom');
 
 var port = 8888;
 var authCallbackPath = '/auth/spotify/callback';
@@ -175,7 +177,6 @@ app.post('/create', async function(req,res) {
         artists: req.body.artistsEnter,
         genres: req.body.genresEnter,
         year: req.body.yearEnter,
-        uuid: uuid.v4(),
         tracks: response[0]
     });
 
@@ -221,7 +222,7 @@ app.get('/playlists', function(req,res) {
       console.log(err);
     } else {
       if (playlists) {
-       // console.log("playlist: ", playlists)
+        console.log("playlist: ", playlists)
         res.render("playlists", {listOfPlaylists: playlists})
       }
     }
@@ -232,22 +233,20 @@ app.get('/playlists', function(req,res) {
 })
 
 //individual playlists page
-app.get('/:playlistUuid', function(req,res) {
+app.get('/:playlistId', function(req,res) {
     //Basically open the create page with filled out fields.
     //what is the id?
-   const playlistUuid = req.path.slice(1)
+   const id = req.path.slice(1)
 
-   Playlist.find({uuid: playlistUuid}, function (err, playlist) {
+   Playlist.find({playlistId: id}, function (err, playlist) {
     if (err) {
       console.log(err);
     } else {
       if (playlist.length != 0) {
         //Wrong, you actually want a entirely UNIQUE ID associated with this playlist entry. as a separate field.
-       // console.log("playlist: ", playlists)
         res.render("individualPlaylist", {playlistEdit: playlist[0]})
       }
     }
-
   })
 })
 
@@ -255,37 +254,51 @@ app.get('/:playlistUuid', function(req,res) {
 app.post('/deletePlaylist/:playlistId', function(req,res) { 
   console.log("using this as the DELETE route")
 
-})
+        //extract playlist id from params.
+        //Also unfollow it on the spotify side? yes
+        let promise = deletePlaylist(accessTokenGlobal, req.params.playlistId)
+    
+        promise.then((response) => {  
+          
+          Playlist.deleteOne({playlistId:req.params.playlistId}).then((result) => {
+            //res.redirect("../playlists", {listOfPlaylists: playlists})
+            res.redirect('../playlists')
+          }).catch(err => {
+            console.log("err: ", err)
+          })
+        })
+
+          //delete the playlist with UUID.
+       // console.log("playlist: ", playlists)
+     
+       //rerender playlists page.
+      })
+    
+
 
 //edit an individual playlist page
-app.post('/:playlistUuid', function(req,res) {
+app.post('/:playlistId', function(req,res) {
   console.log("Using this as the PUT route.")
 
-  const uuid = req.path.slice(1)
   //Run same flow adn return track URIs, and compare it with DB
   //add new axios function that changes the name
 
-  Playlist.find({uuid: uuid}, function (err,playlist) {
+  Playlist.find({playlistId: req.params.playlistId }, function (err,playlist) {
     if (err)
       console.log("err: ", err)
     else {
-      console.log("Playlist: ", playlist[0])
-      console.log("REQUEST INNER: ", req)
 
       let values = []
       values = getPlaylistId(playlist[0].playlistIdRef, req.body.artistsEnter, req.body.genresEnter, req.body.yearEnter, req.body.playlistName, true)
-      console.log("values: ", values)
 
       let promise = enterPlaylist(accessTokenGlobal, values[2], values[3], req.body.yearEnter, req.body.playlistName, playlist[0].playlistIdRef, true, playlist[0].tracks, playlist[0].playlistId)
 
       //Do not save if there was wan error!!!!!!!! Need to catch errors.
 
       promise.then((response) => {
-        console.log("RESPONSE: ", response)
         //New Track URIs returned...
-        Playlist.updateOne( {uuid: uuid}, { tracks: response, name: req.body.playlistName, artists: req.body.artistsEnter, genres: req.body.genresEnter, year: req.body.yearEnter }).then((result) => {
+        Playlist.updateOne( {playlistId: req.params.playlistId }, { tracks: response, name: req.body.playlistName, artists: req.body.artistsEnter, genres: req.body.genresEnter, year: req.body.yearEnter }).then((result) => {
           res.render('create')
-          console.log("Result: ", result)
         }).catch((error) => {
           console.log("error: ", error)
         })

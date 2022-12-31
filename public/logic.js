@@ -24,6 +24,35 @@ Need to add editing/adding logic/delete logic. If the target playlist is deleted
 
 */
 
+//Unfollow the playlist, which will delete it.
+function deletePlaylist(accessToken, playlistId) {
+  console.log("Playlist id: ", playlistId)
+  const promise = axios({
+    method: 'delete',
+    url: `https://api.spotify.com/v1/playlists/${playlistId}/followers`,
+    headers: {
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + accessToken,
+      'Content-Type': 'application/json'
+    }
+  }).then((response) => {
+    console.log("RES: ", response)
+    return response;
+  }).catch((err) => {
+    console.log("erreeee:", err)
+    throw new Error('Error putting tracks in playlist')
+    // console.log("Error in putting tracks in playlist! ", err)
+  })
+
+  return promise.then((response) =>  {
+    return response;
+  }).catch((err) => {
+    console.log("cannot delete! ", err)
+    throw new Error("cannot delete playlist", err)
+  })
+
+}
+
 function updateNameOfPlaylist(playlistNameNew, playlistId) {
   const promise = axios({
     method: 'put',
@@ -583,4 +612,4 @@ function addEventListeners (element) {
   }
 }
 
-module.exports = { enterPlaylist, getPlaylistId }
+module.exports = { enterPlaylist, getPlaylistId, deletePlaylist }
