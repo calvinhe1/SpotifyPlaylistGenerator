@@ -192,6 +192,9 @@ app.get('/playlists', function (req, res) {
 
 // individual playlists page
 app.get('/:playlistId', function (req, res) {
+  if (!req.isAuthenticated()) {
+    res.render('index')
+  }
   const id = req.path.slice(1)
 
   Playlist.find({ playlistId: id }, function (err, playlist) {
@@ -215,10 +218,17 @@ app.post('/deletePlaylist/:playlistId', function (req, res) {
     Playlist.deleteOne({ playlistId: req.params.playlistId }).then((result) => {
       res.redirect('../playlists')
     }).catch(err => {
-      console.log('Error in deleting playlist', err)
+      console.log('Error in deleting playlist in database', err)
     })
   }).catch((err) => {
-    console.log('Error in deleting playlist', err)
+    //Add error case where you try to delete a playlist that no longer exists (due to manual deletion)
+    if (err.messsage == "Playlist no longer exists") {
+        Playlist.deleteOne({ playlistId: req.params.playlistId }).then((result) => {
+          res.redirect('../playlists')
+        }).catch(err => {
+          console.log('Error in deleting playlist in database', err)
+        })
+    }
   })
 })
 
@@ -248,6 +258,14 @@ app.post('/:playlistId', function (req, res) {
           res.render('individualPlaylist', { playlistEdit: playlistData, errorMessage: 'Failed to save playlist into database' })
         })
       }).catch((err) => {
+        //Add error case where you try to edit a playlist that no longer exists (due to manual deletion)
+        if (err.messsage == "Playlist no longer exists") {
+          Playlist.deleteOne({ playlistId: req.params.playlistId }).then((result) => {
+            res.redirect('playlists')
+          }).catch(err => {
+            console.log('Error in deleting playlist in database', err)
+          })
+      }
         res.render('individualPlaylist', { playlistEdit: playlistData, errorMessage: err.message })
       })
     }
@@ -257,7 +275,7 @@ app.post('/:playlistId', function (req, res) {
 app.get(
   '/auth/spotify',
   passport.authenticate('spotify', {
-    scope: ['user-read-email', 'user-read-private', 'user-library-read', 'playlist-read-private', 'playlist-modify-private', 'playlist-modify-public'],
+    scope: ['user-read-email', 'user-read-private', 'playlist-modify-private', 'playlist-modify-public'],
     showDialog: true
   })
 )

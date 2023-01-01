@@ -15,13 +15,21 @@ function deletePlaylist (accessToken, playlistId) {
   }).then((response) => {
     return response
   }).catch((err) => {
-    throw new Error('Error putting tracks in playlist')
+    if (err.response.status == 404) {
+      throw new Error("Playlist no longer exists")
+    } else {
+      throw new Error('Error removing tracks in playlist')
+    }
   })
 
   return promise.then((response) => {
     return response
   }).catch((err) => {
-    throw new Error('Cannot delete playlist')
+    if (err.message == "Playlist no longer exists") {
+      throw new Error("Playlist no longer exists")
+    } else {
+      throw new Error('Error removing tracks in playlist')
+    }
   })
 }
 
@@ -452,7 +460,9 @@ async function enterPlaylist (access_token, artistsOfInterest, genresOfInterest,
             }).then((response) => {
         return parsePlaylist(response, genresMap, artistsMap, yearAfterInterest, playlistName, oldTracks, playlistExisting, oldPlaylistName)
       }).catch((err) => {
-        if (err.message == 'No artists, genres, or year entered') {
+        if (err.response && err.response.status == 404) { 
+          throw new Error('Playlist no longer exists')
+        } else if (err.message == 'No artists, genres, or year entered') {
           throw new Error('No artists, genres, or year entered')
         } else if (err.message == 'Please enter an artist if genres are entered') {
           throw new Error('Please enter an artist if genres are entered')
