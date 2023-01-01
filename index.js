@@ -19,7 +19,6 @@ const { enterPlaylist } = require('./public/logic');
 const { deletePlaylist } = require("./public/logic");
 const { response } = require('express');
 const e = require('express');
-const { useParams } = require('react-router-dom');
 
 var port = 8888;
 var authCallbackPath = '/auth/spotify/callback';
@@ -128,7 +127,14 @@ app.get('/', function (req, res) {
   //res.render('index.ejs', {user: req.user});
 
   if (req.isAuthenticated()) {
-    res.render("create.ejs")
+    let data = {};
+    data.playlistEnter = '';
+    data.genresEnter = '';
+    data.artistsEnter = '';
+    data.yearEnter = '';
+    data.playlistName = '';
+
+    res.render("create", {data: data})
   }
   else {
     res.render("index.ejs")
@@ -145,7 +151,20 @@ app.get('/logout', function (req, res) {
 });
 
 app.get('/create', ensureAuthenticated, function (req, res) {
-  res.render('create.ejs')
+
+  if (req.isAuthenticated()) {
+    let data = {};
+    data.playlistEnter = '';
+    data.genresEnter = '';
+    data.artistsEnter = '';
+    data.yearEnter = '';
+    data.playlistName = '';
+
+    res.render("create", {data: data})
+  }
+  else {
+    res.render("index.ejs")
+  }
 });
 
 app.post('/create', async function(req,res) {
@@ -153,22 +172,15 @@ app.post('/create', async function(req,res) {
   //return playlist ID.
 
   //extract playlist id.
-  console.log("REQBODY: ", req.body)
   let values = []
   values = getPlaylistId(req.body.playlistEnter, req.body.artistsEnter, req.body.genresEnter, req.body.yearEnter, req.body.playlistName)
 
-  console.log("VALUES TWF: ", values)
   //enter playlist is not complete yet, the idea is we want it to be completed.
   let promise = enterPlaylist(accessTokenGlobal, values[2], values[3], req.body.yearEnter, values[5], values[0], values[1])
-
-
-  //NEED TO STORE THE PLAYLIST ID OF THE NEW, not the original playlist....
-
 
   //Make a new function (2 promise chains) that extracts track URIs of currnet playlist.
   //Resolve the promise.
   promise.then(async(response) => {  
-    console.log("Response inside nodejs: ", response)
     //Save it in playlist schema.
     const playlist = new Playlist({
         name: values[5],
@@ -181,15 +193,15 @@ app.post('/create', async function(req,res) {
     });
 
     playlist.save().then((result) => {
-      res.redirect("/create")
+      //res.redirect("/create")
+      res.render("create", {successMessage: 'Successful!', data:req.body})
       //res.send(result)
     }).catch((error) => {
-      res.send("error saving playlist to playlist schema")
+      res.render("create", {errorMessage: 'Failed to save playlist into database'})
     })
 
   }).catch((err) => {
-
-    res.render("create", {errorMessage: err.message})
+    res.render("create", {errorMessage: err.message, data:req.body})
   })
   
   //return the playlist id, however, make sure to nothing breaks e.g. deleting something before playing list is finished (race conditions)
@@ -266,6 +278,9 @@ app.post('/deletePlaylist/:playlistId', function(req,res) {
           }).catch(err => {
             console.log("err: ", err)
           })
+        }).catch((err) => {
+            //catch error here.
+
         })
 
           //delete the playlist with UUID.
@@ -287,33 +302,30 @@ app.post('/:playlistId', function(req,res) {
     if (err)
       console.log("err: ", err)
     else {
-
       let values = []
       values = getPlaylistId(playlist[0].playlistIdRef, req.body.artistsEnter, req.body.genresEnter, req.body.yearEnter, req.body.playlistName, true)
 
-      let promise = enterPlaylist(accessTokenGlobal, values[2], values[3], req.body.yearEnter, req.body.playlistName, playlist[0].playlistIdRef, true, playlist[0].tracks, playlist[0].playlistId)
+      let promise = enterPlaylist(accessTokenGlobal, values[2], values[3], req.body.yearEnter, values[5], playlist[0].playlistIdRef, true, playlist[0].tracks, playlist[0].playlistId, playlist[0].name)
 
-      //Do not save if there was wan error!!!!!!!! Need to catch errors.
+      let playlistData = {}
+      playlistData.genres = req.body.genresEnter;
+      playlistData.artists = req.body.artistsEnter;
+      playlistData.playlistId =  req.params.playlistId;
+      playlistData.year =  req.body.yearEnter;
+      playlistData.name = req.body.playlistName;
 
       promise.then((response) => {
         //New Track URIs returned...
-        Playlist.updateOne( {playlistId: req.params.playlistId }, { tracks: response, name: req.body.playlistName, artists: req.body.artistsEnter, genres: req.body.genresEnter, year: req.body.yearEnter }).then((result) => {
-          res.render('create')
+        Playlist.updateOne( {playlistId: req.params.playlistId }, { tracks: response, name: values[5], artists: req.body.artistsEnter, genres: req.body.genresEnter, year: req.body.yearEnter }).then((result) => {
+          res.render('individualPlaylist', {playlistEdit: playlistData, successMessage: "Successful!"})
         }).catch((error) => {
-          console.log("error: ", error)
+          res.render('individualPlaylist', {playlistEdit: playlistData, errorMessage: 'Failed to save playlist into database'})
         })
+      }).catch((err) => {
+          res.render('individualPlaylist', {playlistEdit: playlistData, errorMessage: err.message})
       })
-      //Update the playlist. -> Add new track URIs, and remove track URIs that are not a part of the new group.
-      //Edit DB here?
-      //Edit DB if successful call.
     }
   })
-  //Run the same code with an existing playlist Id.
-  //get the parameters as well, rerun the function to get track URIs, then compare it with the existing track URIs, and add in the track URIs
-  //that are new.
-  //the new settings might override tracks.
-  //so look at existing tracks, if they match NEW tracks keep, if they do not REMOVE, and if they are new ADD.
-  //ADD spotify track URIs route, Remove spotify track URIs route.
 })
 
 /*

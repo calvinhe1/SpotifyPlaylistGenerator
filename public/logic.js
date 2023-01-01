@@ -24,9 +24,9 @@ Need to add editing/adding logic/delete logic. If the target playlist is deleted
 
 */
 
-//Unfollow the playlist, which will delete it.
-function deletePlaylist(accessToken, playlistId) {
-  console.log("Playlist id: ", playlistId)
+// Unfollow the playlist, which will delete it.
+function deletePlaylist (accessToken, playlistId) {
+  console.log('Playlist id: ', playlistId)
   const promise = axios({
     method: 'delete',
     url: `https://api.spotify.com/v1/playlists/${playlistId}/followers`,
@@ -36,24 +36,23 @@ function deletePlaylist(accessToken, playlistId) {
       'Content-Type': 'application/json'
     }
   }).then((response) => {
-    console.log("RES: ", response)
-    return response;
+    console.log('RES: ', response)
+    return response
   }).catch((err) => {
-    console.log("erreeee:", err)
+    console.log('erreeee:', err)
     throw new Error('Error putting tracks in playlist')
     // console.log("Error in putting tracks in playlist! ", err)
   })
 
-  return promise.then((response) =>  {
-    return response;
+  return promise.then((response) => {
+    return response
   }).catch((err) => {
-    console.log("cannot delete! ", err)
-    throw new Error("cannot delete playlist", err)
+    console.log('cannot delete! ', err)
+    throw new Error('cannot delete playlist', err)
   })
-
 }
 
-function updateNameOfPlaylist(playlistNameNew, playlistId) {
+function updateNameOfPlaylist (playlistNameNew, playlistId) {
   const promise = axios({
     method: 'put',
     url: `https://api.spotify.com/v1/playlists/${playlistId}`,
@@ -67,32 +66,28 @@ function updateNameOfPlaylist(playlistNameNew, playlistId) {
     }
   })
 
-  promise.then((response) => {
-    console.log("Changed name?: ", response)
-    return;
-  }).catch((err) => {
-    console.log("error in changing playlist name: ", err)
-  })
+  return promise.then((response) => {
 
+  }).catch((err) => {
+    throw new Error('Failed to change playlist name for existing playlist.')
+  })
 }
 
-function removeTracksInPlaylist(trackURIs, playlistId) {
+function removeTracksInPlaylist (trackURIs, playlistId) {
   const numberOfCalls = Math.ceil(trackURIs.length / 100)
 
-  console.log("REMOVE: ", trackURIs)
-  let formattedData = []
+  const formattedData = []
 
-  for (let i=0; i<trackURIs.length; i++) {
-
-    let obj = {}
-    obj["uri"] = trackURIs[i]
+  for (let i = 0; i < trackURIs.length; i++) {
+    const obj = {}
+    obj.uri = trackURIs[i]
     formattedData.push(obj)
   }
 
   const promises = []
   for (let i = 0; i < numberOfCalls; i++) {
     // limit of 100 tracks per API request
-    const groupOfTracks = formattedData.slice(0, 100)
+    // const groupOfTracks = formattedData.slice(0, 100)
     // console.log("Group: ", groupOfTracks)
     // NoW: put your tracks in playlist with all your URIs.
     // Note: only works for up to 100?
@@ -108,10 +103,9 @@ function removeTracksInPlaylist(trackURIs, playlistId) {
         'Content-Type': 'application/json'
       }
     }).then((response) => {
-      console.log('Successful!')
     }).catch((err) => {
-      //console.log("err:", err)
-      throw new Error('Error putting tracks in playlist')
+      // console.log("err:", err)
+      throw new Error('Error removing tracks in playlist')
       // console.log("Error in putting tracks in playlist! ", err)
     })
 
@@ -133,18 +127,14 @@ function removeTracksInPlaylist(trackURIs, playlistId) {
   }
 
   return Promise.all(promises).then(function (resp) {
-    //console.log('Copy of track URIs: ', copyOfTrackURIs)
-    return;
+    // console.log('Copy of track URIs: ', copyOfTrackURIs)
+
   }).catch((err) => {
-    throw new Error('Error putting tracks in playlist')
+    throw new Error('Error resolving promises for removing tracks in playlist')
   })
-
-
 }
 
 function putTracksInPlaylist (trackURIs, playlistId) {
-
-  console.log("PUT TRACKS: ", trackURIs)
   // New playlist, put tracks inside.
   const numberOfCalls = Math.ceil(trackURIs.length / 100)
 
@@ -159,7 +149,6 @@ function putTracksInPlaylist (trackURIs, playlistId) {
   for (let i = 0; i < numberOfCalls; i++) {
     // limit of 100 tracks per API request
     const groupOfTracks = trackURIs.slice(0, 100)
-    console.log("playlist id: group: ", playlistId, groupOfTracks)
 
     // console.log("Group: ", groupOfTracks)
     // NoW: put your tracks in playlist with all your URIs.
@@ -176,10 +165,8 @@ function putTracksInPlaylist (trackURIs, playlistId) {
         'Content-Type': 'application/json'
       }
     }).then((response) => {
-      console.log('Successful!')
     }).catch((err) => {
       throw new Error('Error putting tracks in playlist')
-      // console.log("Error in putting tracks in playlist! ", err)
     })
 
     promises.push(promise)
@@ -190,7 +177,6 @@ function putTracksInPlaylist (trackURIs, playlistId) {
         noMoreTracks = true
         break
       }
-
       trackURIs.shift()
     }
 
@@ -200,11 +186,11 @@ function putTracksInPlaylist (trackURIs, playlistId) {
   }
 
   return Promise.all(promises).then(function (resp) {
-    //console.log('Copy of track URIs: ', copyOfTrackURIs)
-    //This is the new playlist id.
+    // console.log('Copy of track URIs: ', copyOfTrackURIs)
+    // This is the new playlist id.
     return [copyOfTrackURIs, playlistId]
   }).catch((err) => {
-    throw new Error('Error putting tracks in playlist')
+    throw new Error('Error resolving promises for putting tracks in playlist')
   })
 }
 
@@ -236,7 +222,6 @@ function createPlaylist (userId, trackURIs, playlistName) {
 }
 
 function validateGenres (response, genresOfInterest) {
-  console.log("response!!!!: ", response)
   for (const genre in genresOfInterest) {
     for (let j = 0; j < response.genres.length; j++) {
       if (response.genres[j].toUpperCase().includes(genre)) { return true }
@@ -245,49 +230,50 @@ function validateGenres (response, genresOfInterest) {
   return false
 }
 
-function compareTracks(oldTracks=[], newTracks=[]) {
-  //Get final list of NEW addition tracks and traacks that NEED to be removed.
-  //New list of tracks subtract tracks already in -> Tracks that need to be added
-  //Old tracks that do not belong in NEW tracks -> Tracks that need to be removed.
-  console.log("Tracks: ", oldTracks, newTracks)
-  let newMap = {}
+function compareTracks (oldTracks = [], newTracks = []) {
+  // Get final list of NEW addition tracks and traacks that NEED to be removed.
+  // New list of tracks subtract tracks already in -> Tracks that need to be added
+  // Old tracks that do not belong in NEW tracks -> Tracks that need to be removed.
+  console.log('Tracks: ', oldTracks, newTracks)
+  const newMap = {}
 
-  for (let i=0; i<newTracks.length; i++) {
+  for (let i = 0; i < newTracks.length; i++) {
     newMap[newTracks[i]] = 1
   }
 
-  console.log("new map: ", newMap)
+  console.log('new map: ', newMap)
 
-  let removeTracks = []
-  let existingTracks = {}
-  let addTracks = []
+  const removeTracks = []
+  const existingTracks = {}
+  const addTracks = []
 
-  for (let i=0; i<oldTracks.length; i++) {
+  for (let i = 0; i < oldTracks.length; i++) {
     if (!(oldTracks[i] in newMap)) {
       removeTracks.push(oldTracks[i])
     } else {
       existingTracks[oldTracks[i]] = 1
     }
   }
-  console.log("Existing tracks: ", existingTracks)
+  console.log('Existing tracks: ', existingTracks)
 
-  for (let i=0; i<newTracks.length; i++) {
+  for (let i = 0; i < newTracks.length; i++) {
     if (!(newTracks[i] in existingTracks)) {
       addTracks.push(newTracks[i])
     }
   }
 
   return [addTracks, removeTracks, newTracks]
-
 }
 
-function parsePlaylist (response, genres, artists, year, playlistName, oldTracks = [], existingPlaylistId='', oldPlaylistName='') {
+function parsePlaylist (response, genres, artists, year, playlistName, oldTracks = [], existingPlaylistId = '', oldPlaylistName = '') {
   // return 4
 
-  console.log("params in parse: ", genres, artists, year, playlistName, oldTracks, existingPlaylistId, oldPlaylistName)
+  console.log('OOG DATA: ', response)
+  console.log('YEAR: ', year)
   const tracks = response.data.tracks
   const trackURIs = []
 
+  let playlistNameFromSpotify = ''
   let tempTracks = tracks.items
   const promises = []
   const promisesInner = []
@@ -303,11 +289,6 @@ function parsePlaylist (response, genres, artists, year, playlistName, oldTracks
     throw new Error('Please enter an artist if genres are entered')
   }
 
-  /* If only genres are provided, can just consider ALL artists with those genres.
-    if (lengthArtists == 0 && year == '') {
-        alert("No artist or year entered!")
-        //Entering a genre without an artist will not give any useful results.
-    } */
   if (year) { year - 1 }
   const numberOfCalls = Math.floor(tracks.total / 100)
 
@@ -329,25 +310,20 @@ function parsePlaylist (response, genres, artists, year, playlistName, oldTracks
             tempTracks = tempTracks.concat(response.data.items)
           }).catch((err) => {
             // console.log("Unable to extract spotify playlist", err)
-            throw new Error('Error in GET playlist', err)
+            throw new Error('Error in GET playlist')
           })
 
     promises.push(promise)
     // Tracks.next only works for 2 slides.
   }
 
-  // How about construct all your tracks before doing any processing.
   return Promise.all(promises).then(function (resp) {
-    // Here, trackURIs is finalized.
-    // console.log("Track URIS: ", tempTracks)
-    // Execute code here.
-
     let desiredArtistIds = []
 
+    playlistNameFromSpotify = tempTracks[0].name
+    console.log('playlistname from spotify: ', tempTracks[0])
+
     for (let i = 0; i < tempTracks.length; i++) {
-      if (year != '' && new Date(tempTracks[i].added_at) < new Date(year)) {
-        continue
-      }
       // Go through artists and check if any fall in the map, if so, this track is good.
       const artistsOfTrack = tempTracks[i].track.artists // this is all the artists in a track.
 
@@ -368,60 +344,17 @@ function parsePlaylist (response, genres, artists, year, playlistName, oldTracks
           desiredArtistIds.push(artistsOfTrack[j].id)
         }
       }
-
-      // there are desired artists and there are artists.
-      // Call API to desired artists, and check what genre the desiredArtist(s) belongs to.
-      // if b.e.
-
-      // too much repeated calls for a specific artists probably.
-      /*
-      for (let j = 0; j < desiredArtistIds.length; j++) {
-
-        //Breaking rate limiting, because too much repetitive calls e.g. breaks at 2020.
-        //Make potentially number of artists in 1 track * number of tracks, and if it is the same ARTIST (this case), it'll
-        //be repetive
-        //instead want to make ONE single call for ALL of the DESIRED artists together.
-        //Then loop through the OBJECT of ARTISTS, and if AN ARTIST passes GENRE CHECK, ADD TRACKS WITH THIS ARTIST IN IT.
-        //So make A BRAND NEW LIST OF SUCCESSFUL CANDITATE ARTISTS.............
-        //THEN REGO OVER all the tracks and IF IT HAS THE ABOVE ARTIST, THEN passes.
-        //Slower but 1 API call only.
-
-        const promise = axios
-          .get(
-                        `https://api.spotify.com/v1/artists/${desiredArtistIds[j]}`, {
-                          headers: {
-                            Accept: 'application/json',
-                            Authorization: 'Bearer ' + accessToken,
-                            'Content-Type': 'application/json'
-                          }
-                        }).then((response) => {
-            // Call a funciton that validates genres, if so mark this track as a canditate.
-
-            if (lengthGenres == 0 || validateGenres(response, genres)) {
-              if (!(trackURIs.includes(tempTracks[i].track.uri))) {
-                numberOfTracks = trackURIs.push(tempTracks[i].track.uri)
-              }
-            }
-          }).catch((err) => {
-            throw new Error('Error getting artist info', err)
-            // console.log(`Error in getting artist ID: ${desiredArtistIds[j]}`, err)
-          })
-        promisesInner.push(promise)
-      } */
     }
     desiredArtistIds = [...new Set(desiredArtistIds)]
 
-    
     const numberOfCalls = Math.ceil(desiredArtistIds.length / 50)
     const promisesArtistsCall = []
     for (let i = 0; i < numberOfCalls; i++) {
-      let currentArtists = desiredArtistIds.slice(i*50, (i+1)*50)
-      let stringArtists = currentArtists.toString()
-      let finalURL = `https://api.spotify.com/v1/artists` + '?ids=' + stringArtists
-      //Why is htis not working???????
+      const currentArtists = desiredArtistIds.slice(i * 50, (i + 1) * 50)
+      const stringArtists = currentArtists.toString()
       const promise = axios({
         method: 'get',
-        url: `https://api.spotify.com/v1/artists` + '?ids=' + stringArtists,
+        url: 'https://api.spotify.com/v1/artists' + '?ids=' + stringArtists,
         headers: {
           Accept: 'application/json',
           Authorization: 'Bearer ' + accessToken,
@@ -430,97 +363,113 @@ function parsePlaylist (response, genres, artists, year, playlistName, oldTracks
       }).then((res) => {
         return res
       })
-      .catch((err) => {
-       //console.log("err arts: ",  err.response)
-      })
+        .catch((err) => {
+          throw new Error('Failed to GET artists information')
+        })
 
       promisesArtistsCall.push(promise)
     }
-    console.log("Desired artists: ", desiredArtistIds)
 
     // Resolve all promises.
     return Promise.all(promisesArtistsCall).then((response) => {
-
-      console.log("response: ", response.data)
       // Now you have all the artists, loop through them all.
       const genreCheckArtists = []
-
-      for (let i = 0; i < response[0].data.artists.length; i++) {
-        // Check
-        if (lengthGenres == 0 || validateGenres(response[0].data.artists[i], genres)) {
-          genreCheckArtists.push(response[0].data.artists[i].id)
+      // if there are artists that matched artists in the current list of tracks
+      if (desiredArtistIds.length != 0) {
+        for (let i = 0; i < response[0].data.artists.length; i++) {
+          // Check
+          if (lengthGenres == 0 || validateGenres(response[0].data.artists[i], genres)) {
+            genreCheckArtists.push(response[0].data.artists[i].id)
+          }
         }
-      }
 
-      // Now go through tracks and if it contains any artists that pased above checks add them.
-      for (let i = 0; i < tempTracks.length; i++) {
-        // check if the track contains any artists that pass check.
+        // Now go through tracks and if it contains any artists that pased above checks add them.
+        for (let i = 0; i < tempTracks.length; i++) {
+          // check if the track contains any artists that pass check.
+          if (year != '' && new Date(tempTracks[i].added_at) < new Date(year)) {
+            continue
+          }
+          const artists = tempTracks[i].track.artists
 
-        const artists = tempTracks[i].track.artists
-
-        for (let j = 0; j < artists.length; j++) {
-          if (genreCheckArtists.includes(artists[j].id)) {
-            if (!(trackURIs.includes(tempTracks[i].track.uri))) {
-              numberOfTracks = trackURIs.push(tempTracks[i].track.uri)
+          for (let j = 0; j < artists.length; j++) {
+            if (genreCheckArtists.includes(artists[j].id)) {
+              if (!(trackURIs.includes(tempTracks[i].track.uri))) {
+                numberOfTracks = trackURIs.push(tempTracks[i].track.uri)
+              }
+              break
             }
-            break
           }
         }
       }
-      return Promise.all(promisesInner).then(function (resp) {
-        if (numberOfTracks != 0 && oldTracks.length == 0) {
-          console.log("NO")
-          return axios
-            .get(
-              'https://api.spotify.com/v1/me', {
-                headers: {
-                  Accept: 'application/json',
-                  Authorization: 'Bearer ' + accessToken,
-                  'Content-Type': 'application/json'
-                }
-              }).then((response) => {
+      if (oldTracks.length == 0) {
+        return axios
+          .get(
+            'https://api.spotify.com/v1/me', {
+              headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + accessToken,
+                'Content-Type': 'application/json'
+              }
+            }).then((response) => {
             // Call a funciton that validates genres, if so mark this track as a canditate.
             // console.log("Response: ", response)
-              return createPlaylist(response.data.id, trackURIs, playlistName)
-            }).catch((err) => {
-              throw new Error('Error in getting spotify user ID')
-            })
-        } else if (oldTracks.length != 0) {
-            //Playlist already exists.
-          console.log("HERE?")
-            //Here do your track URIs comparison and old. Then, add tracks and remove accordingly.
+            return createPlaylist(response.data.id, trackURIs, playlistName)
+              .catch((err) => {
+                throw new Error('Error in creating playlist')
+              })
+          }).catch((err) => {
+            if (err.message == 'Error in creating playlist') { throw new Error('Error in creating playlist') } else { throw new Error('Error in getting spotify user ID') }
+          })
+      } else if (oldTracks.length != 0) {
+        // Playlist already exists.
+        // Here do your track URIs comparison and old. Then, add tracks and remove accordingly.
+        const tracks = compareTracks(oldTracks, trackURIs)
 
-            let tracks = compareTracks(oldTracks, trackURIs)
-            console.log("TRACSK[2]: ", tracks[2])
+        console.log('HER?')
 
-            return putTracksInPlaylist(tracks[0], existingPlaylistId).then((response) => {
-                return removeTracksInPlaylist(tracks[1], existingPlaylistId).then((res) => {
-                    //Change playlist name if it applies?
-                  if (oldPlaylistName != playlistName) {
-                      return updateNameOfPlaylist(playlistName, existingPlaylistId).then((res) => {
-                        return tracks[2]
-                      })
-                  }
-                  return tracks[2]
-                }).catch(err => console.log(err))
-            }).catch(err => console.log(err))
+        return putTracksInPlaylist(tracks[0], existingPlaylistId).then((response) => {
+          return removeTracksInPlaylist(tracks[1], existingPlaylistId).then((res) => {
+            // Change playlist name if it applies?
+            console.log('names: ', oldPlaylistName, playlistName)
 
-
-        }
-      }).catch(function (err) {
-        console.log("error here: ", err.message)
-        throw new Error('Error in resolving promises in parsing playlist')
-      })
+            if (oldPlaylistName != playlistName) {
+              return updateNameOfPlaylist(playlistName, existingPlaylistId).then((res) => {
+                return tracks[2]
+              }).catch((err) => {
+                throw new Error('Failed to change playlist name for existing playlist.')
+              })
+            }
+            return tracks[2]
+          }).catch((err) => {
+            console.log('Err: ', err)
+            if (err.message == 'Failed to change playlist name for existing playlist.') { throw new Error('Failed to change playlist name for existing playlist.') }
+            throw new Error('Failed to remove tracks for existing playlist.')
+          })
+        }).catch((err) => {
+          if (err.message == 'Failed to change playlist name for existing playlist.') { throw new Error('Failed to change playlist name for existing playlist.') } else if (err.message == 'Failed to remove tracks for existing playlist.') { throw new Error('Failed to remove tracks for existing playlist.') } else { throw new Error('Failed to add new tracks to existing playlist.') }
+        })
+      }
     })
-  })
-    .catch(function (err) {
-      console.log('errrewqr: ', err)
+  }).catch(function (err) {
+    if (err.message == 'Failed to GET artists information') {
+      throw new Error('Failed to GET artists information')
+    } else if (err.message == 'Error in GET playlist') {
+      throw new Error('Error in GET playlist')
+    } else if (err.message == 'Error in getting spotify user ID') {
+      throw new Error('Error in getting spotify user ID')
+    } else if (err.message == 'Failed to remove tracks for existing playlist.') {
+      throw new Error('Failed to remove tracks for existing playlist.')
+    } else if (err.message == 'Failed to add new tracks to existing playlist.') {
+      throw new Error('Failed to add new tracks to existing playlist.')
+    } else if (err.message == 'Error in resolving promises in parsing playlist') {
       throw new Error('Error in resolving promises in parsing playlist')
-    })
+    } else if (err.message == 'Error in creating playlist') {
+      throw new Error('Error in creating playlist')
+    } else if (err.message == 'Failed to change playlist name for existing playlist.') { throw new Error('Failed to change playlist name for existing playlist.') }
+  })
 }
 
-function getPlaylistId (input = '', artistsOfInterest, genresOfInterest, yearAfterInterest, playlistName='', edit=false) {
-
+function getPlaylistId (input = '', artistsOfInterest, genresOfInterest, yearAfterInterest, playlistName = '', edit = false) {
   let isSpotifyLink = false
   let playlist = input
 
@@ -529,7 +478,6 @@ function getPlaylistId (input = '', artistsOfInterest, genresOfInterest, yearAft
     const URL = input.split('/')
     playlist = ''
     const spotifyLink = 'open.spotify.com'
- 
 
     // extract genres and artists, date added.
     for (let i = 0; i < URL.length; i++) {
@@ -544,30 +492,26 @@ function getPlaylistId (input = '', artistsOfInterest, genresOfInterest, yearAft
       }
     }
   } else {
-    isSpotifyLink = true;
-
+    isSpotifyLink = true
   }
-  
-  if (!playlistName.trim())
-    playlistName = "New Playlist"
+
+  if (!playlistName.trim()) { playlistName = 'New Playlist' }
 
   if (artistsOfInterest == '') { artistsOfInterest = [] } else { artistsOfInterest = artistsOfInterest.split(',') }
 
   if (genresOfInterest == '') { genresOfInterest = [] } else { genresOfInterest = genresOfInterest.split(',') }
 
-
   return [playlist, isSpotifyLink, artistsOfInterest, genresOfInterest, yearAfterInterest, playlistName]
 }
 
-//Add a paramter with track URIs in existing.
-async function enterPlaylist (access_token, artistsOfInterest, genresOfInterest, yearAfterInterest, playlistName, playlist, isSpotifyLink, oldTracks=[], playlistExisting='', oldPlaylistName='') {
+// Add a paramter with track URIs in existing.
+async function enterPlaylist (access_token, artistsOfInterest, genresOfInterest, yearAfterInterest, playlistName, playlist, isSpotifyLink, oldTracks = [], playlistExisting = '', oldPlaylistName = '') {
   const artistsMap = {}
   const genresMap = {}
 
   accessToken = access_token
-  
-  console.log("params: ", artistsOfInterest, genresOfInterest, yearAfterInterest, playlistName, playlist, isSpotifyLink, oldTracks, playlistExisting)
-  // enterPlaylist(accessTokenGlobal, values[2], values[3], req.body.yearEnter, req.body.playlistName, playlist[0].playlistIdRef, true, playlist[0].tracks, playlist[0].playlistId)
+
+  if (!isSpotifyLink || playlist == '') { throw new Error('Please enter a playlist link from Spotify') }
 
   for (let i = 0; i < artistsOfInterest.length; i++) {
     artistsMap[artistsOfInterest[i].toUpperCase()] = 1
@@ -576,7 +520,6 @@ async function enterPlaylist (access_token, artistsOfInterest, genresOfInterest,
   for (let i = 0; i < genresOfInterest.length; i++) {
     genresMap[genresOfInterest[i].toUpperCase()] = 1
   }
-  console.log("map of artists: ", artistsMap)
 
   if (isSpotifyLink && playlist != '') {
     // Create a new playlist.
@@ -592,12 +535,27 @@ async function enterPlaylist (access_token, artistsOfInterest, genresOfInterest,
             }).then((response) => {
         return parsePlaylist(response, genresMap, artistsMap, yearAfterInterest, playlistName, oldTracks, playlistExisting, oldPlaylistName)
       }).catch((err) => {
-        //console.log('err inside: ', err.response)
+        // console.log('err inside: ', err.response)
+        console.log('Error: ', err)
         if (err.message == 'No artists, genres, or year entered') {
           throw new Error('No artists, genres, or year entered')
         } else if (err.message == 'Please enter an artist if genres are entered') {
           throw new Error('Please enter an artist if genres are entered')
-        }
+        } else if (err.message == 'Error in GET playlist') {
+          throw new Error('Error in GET playlist')
+        } else if (err.message == 'Failed to GET artists information') {
+          throw new Error('Failed to GET artists information')
+        } else if (err.message == 'Error in getting spotify user ID') {
+          throw new Error('Error in getting spotify user ID')
+        } else if (err.message == 'Failed to remove tracks for existing playlist.') {
+          throw new Error('Failed to remove tracks for existing playlist.')
+        } else if (err.message == 'Failed to add new tracks to existing playlist.') {
+          throw new Error('Failed to add new tracks to existing playlist.')
+        } else if (err.message == 'Error in resolving promises in parsing playlist') {
+          throw new Error('Error in resolving promises in parsing playlist')
+        } else if (err.message == 'Error in creating playlist') {
+          throw new Error('Error in creating playlist')
+        } else if (err.message == 'Failed to change playlist name for existing playlist.') { throw new Error('Failed to change playlist name for existing playlist.') }
       })
   }
 }

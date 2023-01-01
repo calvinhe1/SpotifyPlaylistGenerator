@@ -22,37 +22,43 @@
                 <form action="" method="post">
                     <div class="mb-5">
                         <label for="playlistEnter" class="form-label headerText">Enter playlist URL you want to filter from Spotify (e.g. https://open.spotify.com/playlist/1X4m3caIi1cAXAC5gUO0Ny) </label>
-                        <input name="playlistEnter" id="playlistEnter" class="form-control">
+                        <input name="playlistEnter" id="playlistEnter" class="form-control" value="<%- data.playlistEnter %>"> 
+                        
+                                                                 
                     </div>
 
                     <div class="mb-5">
                         <label for="genresEnter" class="form-label headerText" class="headerText">Enter genre(s) of interest separated by commas (genres can be found <a href = "https://everynoise.com/everynoise1d.cgi?scope=all">here</a>, e.g. pop,rap). Leaving this empty will consider all genres.</label>
-                        <input name="genresEnter" id="genresEnter" class="form-control">
+                        <input name="genresEnter" id="genresEnter" class="form-control" value="<%- data.genresEnter %>">
                         </select>
                     </div>
 
                     <div class="mb-5">
                         <label for="artistsEnter" class="form-label headerText" class="headerText">Enter artist(s) of interest separated by commas (e.g. Justin Bieber,Drake,Billie Ellish). Leaving this empty will consider all artists.</label>
-                        <input name="artistsEnter" id="artistsEnter" class="form-control">
+                        <input name="artistsEnter" id="artistsEnter" class="form-control" value="<%- data.artistsEnter %>">
                         </select>
                     </div>
 
                     <div class="mb-5">
                         <label for="yearEnter" class="form-label headerText" class="headerText">Enter year (e.g. 2019, this means all songs that were added from 2019 and beyond in the above playlist will be added to the new playlist). <br>Leaving this empty will consider all years.</br></label>
-                        <input name="yearEnter"  id="yearEnter" class="form-control">
+                        <input name="yearEnter"  id="yearEnter" class="form-control" value="<%- data.yearEnter %>">
                         </select>
                     </div>
 
                     <div class="mb-5">
                         <label for="playlistName" class="form-label headerText" class="headerText">Enter new playlist name (Default: New Playlist) </label>
-                        <input name="playlistName" id="playlistName" class="form-control">
+                        <input name="playlistName" id="playlistName" class="form-control" value="<%- data.playlistName %>">
                         </select>
                     </div>
                     <div style="text-align: center">
-                            <input id="enter" class="btn btn-primary btn-lg" type="submit"  value="Filter playlist">
+                            <input id="enter" class="btn btn-primary btn-lg" type="submit"  value="Create playlist">
                             <div class="errorMessages">
                                 <% if (locals.errorMessage) %>
                                     <%- locals.errorMessage %>
+                            </div>
+                            <div class="successMessage">
+                                <% if (locals.successMessage) %>
+                                    <%- locals.successMessage %>
                             </div>
                     </form>
                 </div>

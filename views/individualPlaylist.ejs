@@ -43,7 +43,15 @@
                         <input name="playlistName" id="playlistName" class="form-control" value='<%- playlistEdit.name %>'>
                     </div>
                     <div style="text-align: center">
-                            <input id="enter" class="btn btn-primary btn-lg" type="submit"  value="Filter playlist">
+                            <input id="enter" class="btn btn-primary btn-lg" type="submit"  value="Edit playlist">
+                            <div class="errorMessages">
+                                <% if (locals.errorMessage) %>
+                                    <%- locals.errorMessage %>
+                            </div>
+                            <div class="successMessage">
+                                <% if (locals.successMessage) %>
+                                    <%- locals.successMessage %>
+                            </div>
                     </form>
                 </div>
             </div>
