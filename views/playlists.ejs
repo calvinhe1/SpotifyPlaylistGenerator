@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Playlist Generator</title>
+    <link rel="shortcut icon" href="images/spotify.webp">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+    <input class="btn btn-primary btn-lg headerButtons" type="button" onclick="window.location='/logout'" value="Logout">
+    <input id="allPlaylists" class="btn btn-primary btn-lg" type="button" onclick="window.location='/playlists'" value="Playlists">
+    <input id="create" class="btn btn-primary btn-lg" type="button" onclick="window.location='/create'" value="Create Playlist">
+    <br>
+    <div class= "centerPlaylists">
+        <div class="btn-group-vertical">
+            <% listOfPlaylists.forEach(function(playlist) { %>
+                <form action="deletePlaylist/<%- playlist.playlistId %>" method="POST"><button class="deleteButton">X</button></form><button class="btn btn-primary btn-lg tester" onclick="window.location='/<%- playlist.playlistId  %>';"><%- playlist.name %></button>
+            <% }) %>
+        </div>
+    </div>
+</body>
+
+</html>

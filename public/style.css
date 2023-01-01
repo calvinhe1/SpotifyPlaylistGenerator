@@ -1,0 +1,70 @@
+.container{
+    margin-top: 50px;
+    padding: 20px;
+    background-color: rgba(94, 195, 241, 0.527);
+    border: 5px solid black;
+    margin-bottom: 50px;
+}
+
+
+.headerText {
+    font-weight: bold;
+}
+
+.projectName {
+    font-weight: bold;
+    margin-bottom: 40px;
+    text-align: center;
+    color: white;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.notes {
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.list {
+    font-size: 20px;
+    color:rgb(7, 0, 0)
+}
+
+.keepInMind {
+    text-align: center; 
+}
+
+.tester {
+    margin-top: 50px;
+    border: 2px solid black;
+    background-color: rgba(94, 195, 241, 0.527);
+    color: black;
+    margin-bottom: 20px;
+}
+
+.centerPlaylists {
+    text-align: center;
+}
+
+.deleteButton {
+    color: red;
+    height: 27px;
+}
+
+.errorMessages {
+    margin-top: 10px;
+    color: red;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.successMessage {
+    margin-top: 10px;
+    color: green;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.headerButtons {
+    float: right
+}
