@@ -9,16 +9,20 @@ const connectDB = 'mongodb://localhost:27017/playlistDB'
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const findOrCreate = require('mongoose-findorcreate')
-let accessTokenGlobal
 const passportLocalMongoose = require('passport-local-mongoose')
+
+let accessTokenGlobal
+let spotifyProfileId
 
 const { getPlaylistId } = require('./public/logic')
 const { enterPlaylist } = require('./public/logic')
 const { deletePlaylist } = require('./public/logic')
 
+const { User, Playlist, app } = require('./models')
+
 const port = 8888
 const authCallbackPath = '/auth/spotify/callback'
-
+/*
 const app = express()
 
 app.use(express.static(__dirname + '/public'))
@@ -43,6 +47,7 @@ app.use(passport.session())
 mongoose.set('strictQuery', true)
 mongoose.connect(connectDB, { useNewUrlParser: true })
 
+/*
 const userSchema = new mongoose.Schema({
   spotifyId: String,
   email: String,
@@ -65,21 +70,9 @@ const playlistSchema = new mongoose.Schema({
 userSchema.plugin(passportLocalMongoose)
 userSchema.plugin(findOrCreate)
 
+
 const User = new mongoose.model('User', userSchema)
-const Playlist = new mongoose.model('Playlist', playlistSchema)
-
-passport.use(User.createStrategy())
-
-passport.serializeUser(function (user, done) {
-  done(null, user.id)
-})
-
-passport.deserializeUser(function (id, done) {
-  User.findById(id, function (err, user) {
-    done(err, user)
-  })
-})
-
+const Playlist = new mongoose.model('Playlist', playlistSchema)*/
 passport.use(
   new SpotifyStrategy(
     {
@@ -89,9 +82,12 @@ passport.use(
     },
     function (accessToken, refreshToken, expires_in, profile, done) {
       accessTokenGlobal = accessToken
-      User.findOrCreate({ spotifyId: profile.id }, function (err, user) {
-        return done(err, user)
-      })
+      spotifyProfileId = profile.id
+        User.findOrCreate({ spotifyId: profile.id },  function (err, user) {
+          User.updateOne({ spotifyId: profile.id }, { accessToken: accessToken, refreshToken: refreshToken }).then({
+          })
+          return done(err, user)
+        })
     }
   )
 )
@@ -149,7 +145,8 @@ app.post('/create', async function (req, res) {
       artists: req.body.artistsEnter,
       genres: req.body.genresEnter,
       year: req.body.yearEnter,
-      tracks: response[0]
+      tracks: response[0],
+      spotifyId: spotifyProfileId
     })
 
     playlist.save().then((result) => {
