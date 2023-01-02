@@ -21,7 +21,7 @@ if (env == 'production') {
   redirectURI = 'http://localhost:' + port
 }
 
-const port = 8888
+const port = process.env.PORT || 8888
 const authCallbackPath = '/auth/spotify/callback'
 
 passport.use(
