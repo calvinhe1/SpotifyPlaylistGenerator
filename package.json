@@ -11,6 +11,7 @@
   "dependencies": {
     "axios": "^1.2.1",
     "body-parser": "^1.20.1",
+    "btoa": "^1.2.1",
     "consolidate": "^0.16.0",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.8",
