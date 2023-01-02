@@ -12,6 +12,15 @@ const { deletePlaylist } = require('./public/logic')
 
 const { User, Playlist, app } = require('./models')
 
+//Change redirect URI depending on the enviroment
+const env = process.env.ENV || "development"
+let redirectURI
+if (env == 'production') {
+  redirectURI = 'https://whispering-falls-70349.herokuapp.com'
+} else {
+  redirectURI = 'http://localhost:' + port
+}
+
 const port = 8888
 const authCallbackPath = '/auth/spotify/callback'
 
@@ -20,7 +29,7 @@ passport.use(
     {
       clientID: process.env.CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
-      callbackURL: 'http://localhost:' + port + authCallbackPath
+      callbackURL: redirectURI + authCallbackPath
     },
     function (accessToken, refreshToken, expires_in, profile, done) {
       accessTokenGlobal = accessToken
