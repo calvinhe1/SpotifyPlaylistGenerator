@@ -11,13 +11,11 @@ const mongoose = require('mongoose')
 const findOrCreate = require('mongoose-findorcreate')
 const passportLocalMongoose = require('passport-local-mongoose')
 
+// configure Express
 const app = express()
 
 app.use(express.static(__dirname + '/public'))
-// app.engine('ejs', consolidate.nunjucks);
 
-// configure Express
-// app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs')
 
 app.use(bodyParser.urlencoded({
