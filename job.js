@@ -36,11 +36,14 @@ function refreshAccessToken (user) {
 
 // This job is the update the playlists with the currently listed filters every week. Need to store access and refresh tokens for user.
 function job (playlist) {
+  console.log("Playlist: ", playlist)
   console.log(`Running job for user: ${playlist.spotifyId} with playlist id ${playlist.playlistId}`)
   // Refresh access token for every user...... and put it in a map.... so you can access it's access token, but still need to do Playlist.find({}) and User.find({}) then loop through playlists.
   const values = getPlaylistId(playlist.playlistIdRef, playlist.artists, playlist.genres, playlist.year, playlist.name, true)
   const promise = enterPlaylist(map[playlist.spotifyId], values[2], values[3], playlist.year, values[5], playlist.playlistIdRef, true, playlist.tracks, playlist.playlistId, playlist.name)
   promise.then((response) => {
+    console.log("Response: ", response)
+    console.log("Values: ", values)
     return Playlist.updateOne({ playlistId: playlist.playlistId }, { tracks: response, name: values[5], artists: playlist.artists, genres: playlist.genres, year: playlist.year }).then((result) => {
     }).catch((err) => {
       console.log('Failed to save playlist into database', err)
