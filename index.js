@@ -12,6 +12,8 @@ const { deletePlaylist } = require('./public/logic')
 
 const { User, Playlist, app } = require('./models')
 
+const port = process.env.PORT || 8888
+
 //Change redirect URI depending on the enviroment
 const env = process.env.ENV || "development"
 let redirectURI
@@ -21,7 +23,6 @@ if (env == 'production') {
   redirectURI = 'http://localhost:' + port
 }
 
-const port = process.env.PORT || 8888
 const authCallbackPath = '/auth/spotify/callback'
 
 passport.use(
