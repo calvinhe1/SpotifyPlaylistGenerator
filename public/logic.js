@@ -355,7 +355,7 @@ function parsePlaylist (response, genres, artists, year, playlistName, oldTracks
           }).catch((err) => {
             if (err.message == 'Error in creating playlist') { throw new Error('Error in creating playlist') } else { throw new Error('Error in getting spotify user ID') }
           })
-      } else if (oldTracks.length != 0) {
+      } else if (oldTracks.length != 0 && oldPlaylistName == '') {
         const tracks = compareTracks(oldTracks, trackURIs)
         return putTracksInPlaylist(tracks[0], existingPlaylistId).then((response) => {
           return removeTracksInPlaylist(tracks[1], existingPlaylistId).then((res) => {
