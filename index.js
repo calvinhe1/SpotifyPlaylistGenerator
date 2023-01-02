@@ -1,84 +1,19 @@
 require('dotenv').config()
 
-const express = require('express')
-const session = require('express-session')
 const passport = require('passport')
 const SpotifyStrategy = require('passport-spotify').Strategy
-const connectDB = 'mongodb://localhost:27017/playlistDB'
 
-const bodyParser = require('body-parser')
-const mongoose = require('mongoose')
-const findOrCreate = require('mongoose-findorcreate')
 let accessTokenGlobal
-const passportLocalMongoose = require('passport-local-mongoose')
+let spotifyProfileId
 
 const { getPlaylistId } = require('./public/logic')
 const { enterPlaylist } = require('./public/logic')
 const { deletePlaylist } = require('./public/logic')
 
+const { User, Playlist, app } = require('./models')
+
 const port = 8888
 const authCallbackPath = '/auth/spotify/callback'
-
-const app = express()
-
-app.use(express.static(__dirname + '/public'))
-// app.engine('ejs', consolidate.nunjucks);
-
-// configure Express
-// app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs')
-
-app.use(bodyParser.urlencoded({
-  extended: true
-}))
-
-app.use(
-  session({ secret: 'keyboard cat', resave: true, saveUninitialized: true })
-)
-// Initialize Passport!  Also use passport.session() middleware, to support
-// persistent login sessions (recommended).
-app.use(passport.initialize())
-app.use(passport.session())
-
-mongoose.set('strictQuery', true)
-mongoose.connect(connectDB, { useNewUrlParser: true })
-
-const userSchema = new mongoose.Schema({
-  spotifyId: String,
-  email: String,
-  password: String,
-  googleId: String,
-  secret: String
-})
-
-const playlistSchema = new mongoose.Schema({
-  name: String,
-  playlistIdRef: String,
-  playlistId: String,
-  artists: String,
-  genres: String,
-  year: String,
-  uuid: String,
-  tracks: [String]
-})
-
-userSchema.plugin(passportLocalMongoose)
-userSchema.plugin(findOrCreate)
-
-const User = new mongoose.model('User', userSchema)
-const Playlist = new mongoose.model('Playlist', playlistSchema)
-
-passport.use(User.createStrategy())
-
-passport.serializeUser(function (user, done) {
-  done(null, user.id)
-})
-
-passport.deserializeUser(function (id, done) {
-  User.findById(id, function (err, user) {
-    done(err, user)
-  })
-})
 
 passport.use(
   new SpotifyStrategy(
@@ -89,9 +24,12 @@ passport.use(
     },
     function (accessToken, refreshToken, expires_in, profile, done) {
       accessTokenGlobal = accessToken
-      User.findOrCreate({ spotifyId: profile.id }, function (err, user) {
-        return done(err, user)
-      })
+      spotifyProfileId = profile.id
+        User.findOrCreate({ spotifyId: profile.id },  function (err, user) {
+          User.updateOne({ spotifyId: profile.id }, { accessToken: accessToken, refreshToken: refreshToken }).then({
+          })
+          return done(err, user)
+        })
     }
   )
 )
@@ -149,7 +87,8 @@ app.post('/create', async function (req, res) {
       artists: req.body.artistsEnter,
       genres: req.body.genresEnter,
       year: req.body.yearEnter,
-      tracks: response[0]
+      tracks: response[0],
+      spotifyId: spotifyProfileId
     })
 
     playlist.save().then((result) => {
@@ -192,6 +131,9 @@ app.get('/playlists', function (req, res) {
 
 // individual playlists page
 app.get('/:playlistId', function (req, res) {
+  if (!req.isAuthenticated()) {
+    res.render('index')
+  }
   const id = req.path.slice(1)
 
   Playlist.find({ playlistId: id }, function (err, playlist) {
@@ -215,10 +157,17 @@ app.post('/deletePlaylist/:playlistId', function (req, res) {
     Playlist.deleteOne({ playlistId: req.params.playlistId }).then((result) => {
       res.redirect('../playlists')
     }).catch(err => {
-      console.log('Error in deleting playlist', err)
+      console.log('Error in deleting playlist in database', err)
     })
   }).catch((err) => {
-    console.log('Error in deleting playlist', err)
+    //Add error case where you try to delete a playlist that no longer exists (due to manual deletion)
+    if (err.messsage == "Playlist no longer exists") {
+        Playlist.deleteOne({ playlistId: req.params.playlistId }).then((result) => {
+          res.redirect('../playlists')
+        }).catch(err => {
+          console.log('Error in deleting playlist in database', err)
+        })
+    }
   })
 })
 
@@ -248,6 +197,14 @@ app.post('/:playlistId', function (req, res) {
           res.render('individualPlaylist', { playlistEdit: playlistData, errorMessage: 'Failed to save playlist into database' })
         })
       }).catch((err) => {
+        //Add error case where you try to edit a playlist that no longer exists (due to manual deletion)
+        if (err.messsage == "Playlist no longer exists") {
+          Playlist.deleteOne({ playlistId: req.params.playlistId }).then((result) => {
+            res.redirect('playlists')
+          }).catch(err => {
+            console.log('Error in deleting playlist in database', err)
+          })
+      }
         res.render('individualPlaylist', { playlistEdit: playlistData, errorMessage: err.message })
       })
     }
@@ -257,7 +214,7 @@ app.post('/:playlistId', function (req, res) {
 app.get(
   '/auth/spotify',
   passport.authenticate('spotify', {
-    scope: ['user-read-email', 'user-read-private', 'user-library-read', 'playlist-read-private', 'playlist-modify-private', 'playlist-modify-public'],
+    scope: ['user-read-email', 'user-read-private', 'playlist-modify-private', 'playlist-modify-public'],
     showDialog: true
   })
 )

@@ -45,4 +45,4 @@
 1. Changing playlist name manually in Spotify (the playlist name will change if the playlist name in DB is changed, so if the playlist name is edited it will change the playlist name and remove the manually listed)
 2. Manually adding songs in Spotify (these tracks will be untouched if it's not a part of the filter). No logic for this is implemented.
 3. Manually removing songs in Spotify (there will be errors if a song that is part of filter removed, because it's no longer a part of DB) - no point in doing this, because future filters will add/remove, so there's a chance a removed song will be re-added. No logic for this is implemented.
-
+4. If editing or deleting a playlist that was deleted manually on spotify list, will delete it from the database.
