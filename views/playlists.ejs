@@ -18,7 +18,7 @@
     <div class= "centerPlaylists">
         <div class="btn-group-vertical">
             <% listOfPlaylists.forEach(function(playlist) { %>
-                <form action="deletePlaylist/<%- playlist.playlistId %>" method="POST"><button class="deleteButton">X</button></form><button class="btn btn-primary btn-lg tester" onclick="window.location='/<%- playlist.playlistId  %>';"><%- playlist.name %></button>
+                <form action="deletePlaylist/<%- playlist.playlistId %>" method="POST"><button class="deleteButton">X</button></form><button class="btn btn-primary btn-lg singlePlaylist" onclick="window.location='/<%- playlist.playlistId  %>';"><%- playlist.name %></button>
             <% }) %>
         </div>
     </div>

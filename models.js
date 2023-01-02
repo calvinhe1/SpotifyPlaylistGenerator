@@ -4,7 +4,7 @@ const express = require('express')
 const session = require('express-session')
 const passport = require('passport')
 
-const connectDB = 'mongodb://localhost:27017/playlistDB'
+const connectDB = process.env.MONGODB_URI || 'mongodb://localhost:27017/playlistDB'
 
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')

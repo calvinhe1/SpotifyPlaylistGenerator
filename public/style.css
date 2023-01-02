@@ -6,7 +6,6 @@
     margin-bottom: 50px;
 }
 
-
 .headerText {
     font-weight: bold;
 }
@@ -34,7 +33,7 @@
     text-align: center; 
 }
 
-.tester {
+.singlePlaylist {
     margin-top: 50px;
     border: 2px solid black;
     background-color: rgba(94, 195, 241, 0.527);
