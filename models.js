@@ -33,7 +33,9 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 mongoose.set('strictQuery', true)
-mongoose.connect(connectDB, { useNewUrlParser: true })
+mongoose.connect(connectDB, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true })
+.then(()=> console.log("Database connected"))
+.catch(err => console.log("err: ", err))
 
 const playlistSchema = new mongoose.Schema({
   name: String,
