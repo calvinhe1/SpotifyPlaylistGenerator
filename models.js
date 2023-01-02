@@ -3,17 +3,13 @@ require('dotenv').config()
 const express = require('express')
 const session = require('express-session')
 const passport = require('passport')
-const SpotifyStrategy = require('passport-spotify').Strategy
+
 const connectDB = 'mongodb://localhost:27017/playlistDB'
 
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const findOrCreate = require('mongoose-findorcreate')
 const passportLocalMongoose = require('passport-local-mongoose')
-
-
-const port = 8888
-const authCallbackPath = '/auth/spotify/callback'
 
 const app = express()
 
