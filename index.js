@@ -127,8 +127,7 @@ app.get('/playlists', function (req, res) {
   if (!req.isAuthenticated()) {
     res.render('index')
   }
-
-  Playlist.find({}, function (err, playlists) {
+  Playlist.find({ spotifyId: spotifyProfileId }, function (err, playlists) {
     if (err) {
       console.log('Error finding playlists', err)
     } else {
@@ -224,7 +223,7 @@ app.post('/:playlistId', function (req, res) {
 app.get(
   '/auth/spotify',
   passport.authenticate('spotify', {
-    scope: ['user-read-email', 'user-read-private', 'playlist-modify-private', 'playlist-modify-public'],
+    scope:  ['user-read-email', 'user-read-private', 'playlist-modify-private', 'playlist-modify-public', 'playlist-read-private', 'playlist-read-collaborative'],
     showDialog: true
   })
 )
