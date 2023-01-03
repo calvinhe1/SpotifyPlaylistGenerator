@@ -33,7 +33,7 @@ function deletePlaylist (accessToken, playlistId) {
   })
 }
 
-function updateNameOfPlaylist (playlistNameNew, playlistId) {
+function updateNameOfPlaylist (accessToken, playlistNameNew, playlistId) {
   const promise = axios({
     method: 'put',
     url: `https://api.spotify.com/v1/playlists/${playlistId}`,
@@ -54,7 +54,7 @@ function updateNameOfPlaylist (playlistNameNew, playlistId) {
   })
 }
 
-function removeTracksInPlaylist (trackURIs, playlistId) {
+function removeTracksInPlaylist (accessToken, trackURIs, playlistId) {
   const numberOfCalls = Math.ceil(trackURIs.length / 100)
 
   const formattedData = []
@@ -107,10 +107,9 @@ function removeTracksInPlaylist (trackURIs, playlistId) {
   })
 }
 
-function putTracksInPlaylist (trackURIs, playlistId) {
+function putTracksInPlaylist (accessToken, trackURIs, playlistId) {
   const numberOfCalls = Math.ceil(trackURIs.length / 100)
   const copyOfTrackURIs = [...trackURIs]
-
   const promises = []
 
   for (let i = 0; i < numberOfCalls; i++) {
@@ -128,7 +127,10 @@ function putTracksInPlaylist (trackURIs, playlistId) {
         Authorization: 'Bearer ' + accessToken,
         'Content-Type': 'application/json'
       }
-    }).catch(() => {
+    }).then((res) => {
+      console.log("succeeded! ", res)
+    }).catch((err) => {
+      console.log("error: ", err)
       throw new Error('Error putting tracks in playlist')
     })
 
@@ -155,7 +157,7 @@ function putTracksInPlaylist (trackURIs, playlistId) {
   })
 }
 
-function createPlaylist (userId, trackURIs, playlistName) {
+function createPlaylist (accessToken, userId, trackURIs, playlistName) {
   return axios({
     method: 'post',
     url: `https://api.spotify.com/v1/users/${userId}/playlists`,
@@ -215,7 +217,7 @@ function compareTracks (oldTracks = [], newTracks = []) {
   return [addTracks, removeTracks, newTracks]
 }
 
-function parsePlaylist (response, genres, artists, year, playlistName, oldTracks = [], existingPlaylistId = '', oldPlaylistName = '') {
+function parsePlaylist (accessToken, response, genres, artists, year, playlistName, oldTracks = [], existingPlaylistId = '', oldPlaylistName = '') {
   const tracks = response.data.tracks
   const trackURIs = []
   let tempTracks = tracks.items
@@ -231,9 +233,6 @@ function parsePlaylist (response, genres, artists, year, playlistName, oldTracks
     throw new Error('Please enter an artist if genres are entered')
   }
 
-  if (year) { 
-    year = year - 1
-  }
   const numberOfCalls = Math.floor(tracks.total / 100)
 
   let nextLink
@@ -357,11 +356,11 @@ function parsePlaylist (response, genres, artists, year, playlistName, oldTracks
           })
       } else {
         const tracks = compareTracks(oldTracks, trackURIs)
-        return putTracksInPlaylist(tracks[0], existingPlaylistId).then((response) => {
-          return removeTracksInPlaylist(tracks[1], existingPlaylistId).then((res) => {
+        return putTracksInPlaylist(accessToken, tracks[0], existingPlaylistId).then((response) => {
+          return removeTracksInPlaylist(accessToken, tracks[1], existingPlaylistId).then((res) => {
             // Check if playlist name needs to change
             if (oldPlaylistName != playlistName) {
-              return updateNameOfPlaylist(playlistName, existingPlaylistId).then((res) => {
+              return updateNameOfPlaylist(accessToken, playlistName, existingPlaylistId).then((res) => {
                 return tracks[2]
               }).catch((err) => {
                 throw new Error('Failed to change playlist name for existing playlist.')
@@ -393,6 +392,7 @@ function parsePlaylist (response, genres, artists, year, playlistName, oldTracks
     } else if (err.message == 'Error in creating playlist') {
       throw new Error('Error in creating playlist')
     } else if (err.message == 'Failed to change playlist name for existing playlist.') { throw new Error('Failed to change playlist name for existing playlist.') }
+      throw new Error("Miscellaneous error")
   })
 }
 
@@ -435,7 +435,6 @@ async function enterPlaylist (access_token, artistsOfInterest, genresOfInterest,
   const artistsMap = {}
   const genresMap = {}
 
-  accessToken = access_token
 
   if (!isSpotifyLink || playlist == '') { throw new Error('Please enter a playlist link from Spotify') }
 
@@ -454,11 +453,11 @@ async function enterPlaylist (access_token, artistsOfInterest, genresOfInterest,
             `https://api.spotify.com/v1/playlists/${playlist}`, {
               headers: {
                 Accept: 'application/json',
-                Authorization: 'Bearer ' + accessToken,
+                Authorization: 'Bearer ' + access_token,
                 'Content-Type': 'application/json'
               }
             }).then((response) => {
-        return parsePlaylist(response, genresMap, artistsMap, yearAfterInterest, playlistName, oldTracks, playlistExisting, oldPlaylistName)
+        return parsePlaylist(access_token, response, genresMap, artistsMap, yearAfterInterest, playlistName, oldTracks, playlistExisting, oldPlaylistName)
       }).catch((err) => {
         if (err.response && err.response.status == 404) { 
           throw new Error('Playlist no longer exists')
