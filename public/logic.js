@@ -171,7 +171,7 @@ function createPlaylist (accessToken, userId, trackURIs, playlistName) {
       'Content-Type': 'application/json'
     }
   }).then((response) => {
-    return putTracksInPlaylist(trackURIs, response.data.id)
+    return putTracksInPlaylist(accessToken, trackURIs, response.data.id)
   }).catch((err) => {
     throw new Error('Error creating playlist')
   })
@@ -347,7 +347,7 @@ function parsePlaylist (accessToken, response, genres, artists, year, playlistNa
                 'Content-Type': 'application/json'
               }
             }).then((response) => {
-            return createPlaylist(response.data.id, trackURIs, playlistName)
+            return createPlaylist(accessToken, response.data.id, trackURIs, playlistName)
               .catch((err) => {
                 throw new Error('Error in creating playlist')
               })
