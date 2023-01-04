@@ -40,7 +40,6 @@ function job (playlist, accessToken) {
   const values = getPlaylistId(playlist.playlistIdRef, playlist.artists, playlist.genres, playlist.year, playlist.name, true)
   const promise = enterPlaylist(accessToken, values[2], values[3], playlist.year, values[5], playlist.playlistIdRef, true, playlist.tracks, playlist.playlistId, playlist.name)
   return promise.then((response) => {
-    console.log('Values: ', values)
     return Playlist.updateOne({ playlistId: playlist.playlistId }, { tracks: response, name: values[5], artists: playlist.artists, genres: playlist.genres, year: playlist.year }).then((result) => {
     }).catch((err) => {
       console.log('Failed to save playlist into database', err)
@@ -82,10 +81,10 @@ User.find({}, function (err, users) {
           })
         })
           .catch((err) => {
-            console.log('error finding playlists in database', err)
+            console.log('Error finding playlists in database', err)
           })
       }).catch((err) => {
-        console.log('error getting access tokens for users', err)
+        console.log('Error getting access tokens for users', err)
       })
     }
   }

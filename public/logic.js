@@ -127,10 +127,7 @@ function putTracksInPlaylist (accessToken, trackURIs, playlistId) {
         Authorization: 'Bearer ' + accessToken,
         'Content-Type': 'application/json'
       }
-    }).then((res) => {
-      console.log("succeeded! ", res)
     }).catch((err) => {
-      console.log("error: ", err)
       throw new Error('Error putting tracks in playlist')
     })
 
