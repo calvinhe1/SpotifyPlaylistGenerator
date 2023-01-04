@@ -113,15 +113,6 @@ app.post('/create', async function (req, res) {
   })
 })
 
-app.delete('/deleteAllPlaylists', function (req, res) {
-  Playlist.deleteMany({}).then(function () {
-    console.log('Deleted all playlists')
-    res.sendStatus(204)
-  }).catch(function (error) {
-    console.log('Error deleting all playlists', error)
-  })
-})
-
 // View all your playlists page
 app.get('/playlists', function (req, res) {
   if (!req.isAuthenticated()) {
