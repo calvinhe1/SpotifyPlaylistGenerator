@@ -47,8 +47,8 @@ When the user is finished filling out the form, the existing playlist will be up
 When a user no longer wants a playlist, they can delete it in the playlists page and it will be deleted in the user’s Spotify account.
 
 ## Notes
-There will a job that runs daily to update the created playlists in this application. 
-E.g. if a new song is added to the referenced playlist that fits the filters for a created playlist, the created playlist will have the new song added.
+There will a job ran by the Heroku Scheduler that runs daily to update the created playlists in this application. 
+E.g. if a new song is added to a referenced playlist that fits the filters for a created playlist, the created playlist will have the new song added.
 
 With this job, there is no need to enter the application and refilter an existing playlist, this will be done automatically and songs will be removed or added based on the referenced playlist.
 
