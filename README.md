@@ -13,11 +13,11 @@ With this motivation, I decided to create an application that allows for the cre
 1. Login with Spotify and allow access to certain permissions needed
 2. Using the create form, provide the link of an existing Spotify playlist
 3. Provide the genres of interest separated by commas based on the following link: [Every Noise at Once], however can provide short-form genres as well, as the program is flexible on substrings. E.g. typing in pop considers all genres that have the word “pop” in it within the playlist
-..* Example: pop,rap
+    * Example: pop,rap
 4. Provide the artists of interest separated by commas 	.
-..* Example: Khalid,Billie Eilish,Justin Bieber
+    * Example: Khalid,Billie Eilish,Justin Bieber
 5. Provide the earliest year date songs are added to the playlist that you want filtered. E.g. typing in 2022 would consider all songs added starting from 2022 and forward
-..* Example: 2022
+    * Example: 2022
 6. (Optional) Provide a playlist name
 7. Click on ‘Create Playlist’
 8. On your spotify account, you will see the newly generated playlist with all of the applied filters on the target playlist in step #2
@@ -28,10 +28,10 @@ With this motivation, I decided to create an application that allows for the cre
 ![Index](https://user-images.githubusercontent.com/66074281/210477400-0f1a4775-9109-4dee-80e6-5e60f506a78d.png)
 
 ### Create Page
-![Create](https://user-images.githubusercontent.com/66074281/210477316-e13064e1-86f9-4402-bca8-d34b6dae3dca.png)
+![CreateV2](https://user-images.githubusercontent.com/66074281/210478258-5b831eb8-fda8-457a-a633-02da93291ebc.png)
 
 ### Playlists Page
-![Playlists](https://user-images.githubusercontent.com/66074281/210477414-d9457f80-2ebb-4387-87f4-9d29a9ffc0be.png)
+![PlaylistV2](https://user-images.githubusercontent.com/66074281/210478266-9cacc211-0326-4c8b-976a-20ae453776d2.png)
 
 ## Editing a playlist
 
