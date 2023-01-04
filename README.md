@@ -12,7 +12,7 @@ With this motivation, I decided to create an application that allows for the cre
 
 1. Login with Spotify and allow access to certain permissions needed
 2. Using the create form, provide the link of an existing Spotify playlist
-3. Provide the genres of interest separated by commas based on the following link: [Every Noise at Once], however can provide short-form genres as well, as the program is flexible on substrings. E.g. typing in pop considers all genres that have the word “pop” in it within the playlist
+3. Provide the genres of interest separated by commas based on the following link: [Every Noise at Once](https://everynoise.com/everynoise1d.cgi?scope=all), however can provide short-form genres as well, as the program is flexible on substrings. E.g. typing in pop considers all genres that have the word “pop” in it within the playlist
     * Example: pop,rap
 4. Provide the artists of interest separated by commas 	.
     * Example: Khalid,Billie Eilish,Justin Bieber
@@ -22,22 +22,25 @@ With this motivation, I decided to create an application that allows for the cre
 7. Click on ‘Create Playlist’
 8. On your spotify account, you will see the newly generated playlist with all of the applied filters on the target playlist in step #2
 
+
 ## Working Example 
 
 ### Login Page
 ![Index](https://user-images.githubusercontent.com/66074281/210477400-0f1a4775-9109-4dee-80e6-5e60f506a78d.png)
 
 ### Create Page
-![CreateV2](https://user-images.githubusercontent.com/66074281/210478258-5b831eb8-fda8-457a-a633-02da93291ebc.png)
+![Screenshot_56](https://user-images.githubusercontent.com/66074281/210480579-b3170912-f5ff-4e89-866c-89878aa54df8.png)
 
 ### Playlists Page
 ![PlaylistV2](https://user-images.githubusercontent.com/66074281/210478266-9cacc211-0326-4c8b-976a-20ae453776d2.png)
 
+
 ## Editing a playlist
 
-If a user wants to change the filters for a created playlist, e.g. want to consider additional artists or no longer consider a genre, then the user can select “Playlists” button above, select the desired playlist, then edit the form the same way the form was filled out in the creating playlist step. 
+If a user wants to change the filters for a created playlist, e.g. want to consider additional artists or no longer consider a genre, then the user can select the “Playlists” button above, select the desired playlist, then edit the form the same way the form was filled out in the creating playlist step. 
 
-When the user is finished filling out the form, the existing playlist will be updated (remove the tracks that no longer fit the filters and add new tracks from the referenced playlist).
+When the user is finished filling out the form, the existing playlist will be updated (tracks that no longer fit the filters will be removed, and new tracks will be added based on the referenced playlist).
+
 
 ## Deleting a playlist 
 
@@ -50,7 +53,9 @@ E.g. if a new song is added to the referenced playlist that fits the filters for
 With this job, there is no need to enter the application and refilter an existing playlist, this will be done automatically and songs will be removed or added based on the referenced playlist.
 
 ### Deployment
-The application is currently deployed on Heroku, but pending approval from Spotify (which takes about 6 weeks), so it is not currently usable in production for non-added users to my Spotify development application. 
+The application is currently deployed on Heroku here: https://whispering-falls-70349.herokuapp.com, but it is not currently usable in production for non-added users to my Spotify development application. 
+
+To run it locally, fork this repo and create your own Spotify application: https://developer.spotify.com/ with your own client secret, client id, and redirect URI. Then update `index.js` with those values.
 
 
 
