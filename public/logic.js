@@ -226,10 +226,6 @@ function parsePlaylist (accessToken, response, genres, artists, year, playlistNa
     throw new Error('No artists, genres, or year entered')
   }
 
-  if (lengthArtists == 0 && lengthGenres != 0) {
-    throw new Error('Please enter an artist if genres are entered')
-  }
-
   const numberOfCalls = Math.floor(tracks.total / 100)
 
   let nextLink
@@ -307,30 +303,31 @@ function parsePlaylist (accessToken, response, genres, artists, year, playlistNa
     // Resolve all promises.
     return Promise.all(promisesArtistsCall).then((response) => {
       const genreCheckArtists = []
-      // if there are artists that matched artists in the current list of tracks
-      if (desiredArtistIds.length != 0) {
-        for (let i = 0; i < response[0].data.artists.length; i++) {
-          // Check
-          if (lengthGenres == 0 || validateGenres(response[0].data.artists[i], genres)) {
-            genreCheckArtists.push(response[0].data.artists[i].id)
+
+      for (let numCalls = 0; numCalls < response.length; numCalls++) {
+        if (desiredArtistIds.length != 0) {
+          for (let i = 0; i < response[numCalls].data.artists.length; i++) {
+            //Check if artists' genres are a part of desired genres
+            if (lengthGenres == 0 || validateGenres(response[numCalls].data.artists[i], genres)) {
+              genreCheckArtists.push(response[numCalls].data.artists[i].id)
+            }
           }
         }
+      }
+      // Now go through tracks and if it contains any artists that pased above checks add them.
+      for (let i = 0; i < tempTracks.length; i++) {
+        // check if the track contains any artists that pass check.
+        if (year != '' && new Date(tempTracks[i].added_at) < new Date(year)) {
+          continue
+        }
+        const artists = tempTracks[i].track.artists
 
-        // Now go through tracks and if it contains any artists that pased above checks add them.
-        for (let i = 0; i < tempTracks.length; i++) {
-          // check if the track contains any artists that pass check.
-          if (year != '' && new Date(tempTracks[i].added_at) < new Date(year)) {
-            continue
-          }
-          const artists = tempTracks[i].track.artists
-
-          for (let j = 0; j < artists.length; j++) {
-            if (genreCheckArtists.includes(artists[j].id)) {
-              if (!(trackURIs.includes(tempTracks[i].track.uri))) {
-                numberOfTracks = trackURIs.push(tempTracks[i].track.uri)
-              }
-              break
+        for (let j = 0; j < artists.length; j++) {
+          if (genreCheckArtists.includes(artists[j].id)) {
+            if (!(trackURIs.includes(tempTracks[i].track.uri))) {
+              numberOfTracks = trackURIs.push(tempTracks[i].track.uri)
             }
+            break
           }
         }
       }
@@ -460,8 +457,6 @@ async function enterPlaylist (access_token, artistsOfInterest, genresOfInterest,
           throw new Error('Playlist no longer exists')
         } else if (err.message == 'No artists, genres, or year entered') {
           throw new Error('No artists, genres, or year entered')
-        } else if (err.message == 'Please enter an artist if genres are entered') {
-          throw new Error('Please enter an artist if genres are entered')
         } else if (err.message == 'Error in GET playlist') {
           throw new Error('Error in GET playlist')
         } else if (err.message == 'Failed to GET artists information') {
