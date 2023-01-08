@@ -84,6 +84,9 @@ app.get('/create', ensureAuthenticated, function (req, res) {
 })
 
 app.post('/create', async function (req, res) {
+  if (!req.isAuthenticated()) {
+    return res.render('index')
+  }
   let values = []
   values = getPlaylistId(req.body.playlistEnter, req.body.artistsEnter, req.body.genresEnter, req.body.yearEnter, req.body.playlistName)
 
@@ -116,7 +119,7 @@ app.post('/create', async function (req, res) {
 // View all your playlists page
 app.get('/playlists', function (req, res) {
   if (!req.isAuthenticated()) {
-    res.render('index')
+    return res.render('index')
   }
   Playlist.find({ spotifyId: spotifyProfileId }, function (err, playlists) {
     if (err) {
@@ -132,7 +135,7 @@ app.get('/playlists', function (req, res) {
 // individual playlists page
 app.get('/:playlistId', function (req, res) {
   if (!req.isAuthenticated()) {
-    res.render('index')
+    return res.render('index')
   }
   const id = req.path.slice(1)
 
@@ -149,6 +152,9 @@ app.get('/:playlistId', function (req, res) {
 
 // delete individual playlist from the playlist page above
 app.post('/deletePlaylist/:playlistId', function (req, res) {
+  if (!req.isAuthenticated()) {
+    return res.render('../index')
+  }
   console.log('using this as the DELETE route for playlists')
 
   const promise = deletePlaylist(accessTokenGlobal, req.params.playlistId)
@@ -173,6 +179,9 @@ app.post('/deletePlaylist/:playlistId', function (req, res) {
 
 // edit an individual playlist page
 app.post('/:playlistId', function (req, res) {
+  if (!req.isAuthenticated()) {
+    return res.render('index')
+  }
   console.log('Using this as the PUT route for editing playlists.')
 
   Playlist.find({ playlistId: req.params.playlistId }, function (err, playlist) {
