@@ -22,6 +22,8 @@ With this motivation, I decided to create an application that allows for the cre
 7. Click on ‘Create Playlist’
 8. On your Spotify account, you will see the newly generated playlist with all of the applied filters on the target playlist in step #2
 
+**Note**: The only mandatory fields are the playlist link and one of artists, genres, or the year. Not providing one of the fields simply exempts a filter being applied for that field.
+
 ## Editing a playlist
 
 If a user wants to change the filters for a created playlist, e.g. want to consider additional artists or no longer consider a genre, then the user can select the “Playlists” button above, select the desired playlist, then edit the form the same way the form was filled out in the creating playlist step. 
@@ -46,7 +48,7 @@ In this video, the "Test Playlist" playlist is being used as a reference, and th
 
 https://user-images.githubusercontent.com/66074281/211185349-6b4326c2-2a80-4374-bdbc-5599d92cc5a7.mp4
 
-If a user wants to edit the options they filtered with for the newly created playlist, they can view the playlists page and change any fields. In this video, Kupla is added as an artist, lo-fi is added as a genre as the new filtering options, and the name of the playlist is updated. As a result, the playlist created in the previous video was updated with new songs that come from the original reference playlist that pass the new filters, along with a new name.
+If a user wants to edit the options they filtered with for the newly created playlist, they can view the playlists page and change any fields. In this video, Kupla is added as a artist, lo-fi is added as a genre, and the name of the playlist is updated. Applying these filters will result in the playlist created in the previous video being updated with the new songs that come from the original reference playlist that pass the new filters.
 
 ## Deleting a playlist
 https://user-images.githubusercontent.com/66074281/211185354-c766f02b-bb41-4413-bb4b-fbf794d99bf9.mp4
