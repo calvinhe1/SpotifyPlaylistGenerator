@@ -48,7 +48,7 @@ In this video, the "Test Playlist" playlist is being used as a reference, and th
 
 https://user-images.githubusercontent.com/66074281/211185349-6b4326c2-2a80-4374-bdbc-5599d92cc5a7.mp4
 
-If a user wants to edit the options they filtered with for the newly created playlist, they can view the playlists page and change any fields. In this video, Kupla is added as a artist, lo-fi is added as a genre, and the name of the playlist is updated. Applying these filters will result in the playlist created in the previous video being updated with the new songs that come from the original reference playlist that pass the new filters.
+If a user wants to edit the options they filtered with for the newly created playlist, they can view the playlists page and change any fields. In this video, Kupla is added as an artist, lo-fi is added as a genre, and the name of the playlist is updated. Applying these filters will result in the playlist created in the previous video being updated with the new songs that come from the original reference playlist.
 
 ## Deleting a playlist
 https://user-images.githubusercontent.com/66074281/211185354-c766f02b-bb41-4413-bb4b-fbf794d99bf9.mp4
